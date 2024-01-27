@@ -9,8 +9,8 @@ import java.util.Scanner;
 
 public class server {
     public static void main(String[] args) {
-            try (MongoClient mongoClient = MongoClients.create("mongodb://172.26.48.1:27017/")) {
-                MongoDatabase database = mongoClient.getDatabase("lol"); // replace with your database name
+            try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017/")) {
+            MongoDatabase database = mongoClient.getDatabase("lol"); // replace with your database name
             if (database == null) {
                 System.out.println("Database not found");
                 return;
@@ -18,7 +18,7 @@ public class server {
             System.out.println("Connected to the database " + database.getName());
 
             // Get the collection
-            MongoCollection<Document> collection = database.getCollection("lol_lol"); // replace with your collection name
+            MongoCollection<Document> collection = database.getCollection("lol"); // replace with your collection name
             if (collection == null) {
                 System.out.println("Collection not found");
                 return;
