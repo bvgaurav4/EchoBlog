@@ -3,7 +3,10 @@ database is mongodb
 base code will be in java
 and this is going to be cool
 
-
+to install maven
+```bash
+sudo apt install maven
+```
 to clear the compile
 ```bash
 mvn clean
