@@ -7,29 +7,49 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.FindIterable;
 
 import com.mongodb.client.ClientSession;
+import org.bson.types.ObjectId;
+import java.util.List;
 
 import org.bson.Document;
+import org.bson.json.JsonParseException;
 
+import org.bson.Document;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Simpleserver {
-    static MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017/");
-    static MongoDatabase database = mongoClient.getDatabase("lol"); 
-    static MongoCollection<Document> users = database.getCollection("lol"); 
-    static MongoCollection<Document> mgs = database.getCollection("lol2"); 
-    static MongoCollection<Document> blogs = database.getCollection("lol2"); 
-    static MongoCollection<Document> grps = database.getCollection("lol2"); 
-    static MongoCollection<Document> lol5 = database.getCollection("lol2"); 
-    static ClientSession clientSession = mongoClient.startSession();
+    static MongoClient mongoClient;
+    static MongoDatabase database;
+    static MongoCollection<Document> users;
+    static MongoCollection<Document> mgs;
+    static MongoCollection<Document> blogs;
+    static MongoCollection<Document> grps;
+    static MongoCollection<Document> lol5;
+    static ClientSession clientSession;
+
 
     public static void main(String[] args) {
+        try {
+            mongoClient = MongoClients.create("mongodb://localhost:27017/");
+            database = mongoClient.getDatabase("lol");
+            users = database.getCollection("lol");
+            mgs = database.getCollection("lol2");
+            blogs = database.getCollection("lol2");
+            grps = database.getCollection("lol2");
+            lol5 = database.getCollection("lol2");
+            clientSession = mongoClient.startSession();
+        } catch (Exception e) {
+            System.out.println("Database not connected because the server is not running.");
+            e.printStackTrace();
+        }        
         // Set the port for your server (default is 4567)
         Spark.port(4567);
 
         // Define a simple endpoint
-        Spark.get("/hello", (request, response) -> "meow meow nigga");
-        
+        Spark.get("/", (request, response) -> "hello love");
 
+        Spark.get("/hello", (request, response) -> "hello love");
+        
         Spark.get("/greet/:name", (request, response) -> {
             String name = request.params(":name");
             return "Hello, " + name + "!";
@@ -39,7 +59,47 @@ public class Simpleserver {
             response.type("application/json");
             return "{\"message\": \"Hello, JSON!\"}";
         });
-        
+        Spark.post("blog",(request,response)->{
+            response.type("String");
+            return "lol";
+        });
+        Spark.post("message",(request,response)->{
+                        response.type("String");
+            return "lol";
+        });
+        Spark.post("/create", (request, response) -> {
+            try {
+                String body = request.body();
+                Document doc = Document.parse(body);
+
+                if (!doc.containsKey("Email") || !doc.containsKey("Mobile")) {
+                    response.type("error");
+                    return "Missing Email or Mobile";
+                }
+
+                List<Document> orQueries = new ArrayList<>();
+                orQueries.add(new Document("Email", doc.get("Email").toString()));
+                orQueries.add(new Document("Mobile", doc.get("Mobile").toString()));
+
+                Document filter = new Document("$or", orQueries);
+
+                FindIterable<Document> result = users.find(filter);
+                if (result.iterator().hasNext()) {
+                    response.type("error");
+                    return "user already exists";
+                } else {
+                    users.insertOne(doc);
+                    response.type("String");
+                    return "lol";
+                }
+            } catch (JsonParseException e) {
+                response.type("error");
+                return "Invalid JSON in request body";
+            } catch (Exception e) {
+                response.type("error");
+                return "An error occurred: " + e.getMessage();
+            }
+        });
         Spark.get("/login", (request, response) -> {
             String username = request.queryParams("Email");
             String password = request.queryParams("LoginId");
@@ -63,9 +123,11 @@ public class Simpleserver {
 
             String jsonString = jsonBuilder.toString();
 
-            response.type("Boolean");
+            // response.type("Boolean");
+            response.type("application/json");
             
-            return jsonString.equals("[]") ? "false" : "true";
+            // return jsonString.equals("[]") ? "false" : "true";
+            return jsonString;
         });
     }
 }

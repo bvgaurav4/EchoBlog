@@ -19,3 +19,6 @@ to execute the codes
 ```bash
 mvn exec:java -Dexec.mainClass=<name of the file>
 ```
+``` bash 
+mvn clean install
+```

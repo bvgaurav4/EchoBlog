@@ -1,11 +1,6 @@
-package com.mycompany.app;
-// import java.net.*;
-// import java.io.*;
+import java.net.*;
+import java.io.*;
 
-/**
- * Hello world!
- *
- */
 public class App 
 {
     public static void main( String[] args )
