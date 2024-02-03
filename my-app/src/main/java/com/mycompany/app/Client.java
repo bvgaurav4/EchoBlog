@@ -4,16 +4,29 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+
 import java.io.OutputStreamWriter;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import javax.swing.JButton ;
+import javax.swing.JFrame ;
+
+import com.google.gson.JsonObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonPrimitive;
+
+
+import java.awt.FlowLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 public class Client {
      // private classes for the clien
     private Socket socket;
     private BufferedReader buffReader;
     private BufferedWriter buffWriter;
-    private String name;
+    public String name;
 
     public Client(Socket socket, String name){
         try{
@@ -31,6 +44,7 @@ public class Client {
 // method to send messages using thread
     public void sendMessage(){
         try{
+        JsonObject obj = new JsonObject();
             buffWriter.write(name);
             buffWriter.newLine();
             buffWriter.flush();
@@ -39,7 +53,9 @@ public class Client {
 
             while(socket.isConnected()){
                 String messageToSend = sc.nextLine();
-                buffWriter.write(name + ": " + messageToSend);
+                obj.addProperty("name", name);
+                obj.addProperty("message", messageToSend);
+                buffWriter.write(obj.toString());
                 buffWriter.newLine();
                 buffWriter.flush();
 
@@ -59,8 +75,33 @@ public class Client {
 
                 while(socket.isConnected()){
                 try{
+                    System.out.println(buffReader);
+                    Gson gson = new Gson();
+
                     msfFromGroupChat = buffReader.readLine();
-                    System.out.println(msfFromGroupChat);
+                    JsonObject jsonElement = gson.fromJson(msfFromGroupChat, JsonObject.class);
+                    JsonObject test2 ;
+                    if(jsonElement.get("name").getAsString().equals("Server")){
+                        if (jsonElement.isJsonObject()) {
+                            JsonObject jsonObject = jsonElement.getAsJsonObject();
+                            // Handle JSON object
+                        } else if (jsonElement.isJsonPrimitive()) {
+                            JsonPrimitive jsonPrimitive = jsonElement.getAsJsonPrimitive();
+                            System.out.println(jsonPrimitive);
+                            // Handle JSON primitive
+                        } else {
+                            // Handle other types (e.g., JsonArray, JsonNull)
+                            System.out.println(jsonElement);
+                        }
+                        // test2 = test.get("message").getAsJsonObject();
+                        System.out.println(jsonElement.get("message").getAsString());
+                        System.out.println("who do u want to text to");
+                        // System.out.println(test2);
+                        continue;
+                    }
+                    else{
+                        System.out.println(msfFromGroupChat);
+                    }
                 } catch (IOException e){
                     closeAll(socket, buffReader, buffWriter);
                 }

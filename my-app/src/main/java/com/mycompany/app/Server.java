@@ -6,10 +6,14 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.FindIterable;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.mongodb.client.ClientSession;
 import org.bson.types.ObjectId;
 import java.util.List;
 
+import com.google.gson.JsonObject;
+import com.google.gson.Gson;
 import org.bson.Document;
 import org.bson.json.JsonParseException;
 
@@ -21,7 +25,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import clienthandler.ClientHandler;
 public class Server {
-    // create serverSocket class 
+    private ConcurrentHashMap< ClientHandler, String> clients = new ConcurrentHashMap<>();
     private ServerSocket serverSocket;
     private static MongoClient mongoClient;
     private static MongoDatabase database;
@@ -40,21 +44,26 @@ public class Server {
     public void serverStart(){
 
         try{
-            // check and loop the serverSocket
+
             while(!serverSocket.isClosed()){
                 Socket socket = serverSocket.accept();
-                System.out.println("New Friend Connected");
-                // implemented an object which handle runnable class
-                ClientHandler clientHandler = new ClientHandler(socket);
 
+                System.out.println("New Friend Connected");
+                ClientHandler clientHandler = new ClientHandler(socket);
+                JsonObject obj = new JsonObject();
+                obj.addProperty("name", "Server");
+                clients.put( clientHandler,clientHandler.name);
+                System.out.println(clientHandler + " is added to the list of clients.");
+                System.out.println("Total clients: " + clients);
+                obj.addProperty("message", clients.toString());
+                clientHandler.boradcastMessage(obj.toString());
                 Thread thread = new Thread(clientHandler);
                 thread.start();
             }
         } catch (IOException e){
-
+            System.out.println("Server is closed");
         }
     }
-    // this will close the server
     public void closerServer(){
         
         try{
@@ -67,8 +76,6 @@ public class Server {
     }
 
     public static void main(String[] args) throws Exception {
-        ServerSocket serverSocket = new ServerSocket(1234);
-        Server server = new Server(serverSocket);
          try {
             mongoClient = MongoClients.create("mongodb://localhost:27017/");
             database = mongoClient.getDatabase("lol");
@@ -81,12 +88,12 @@ public class Server {
         } catch (Exception e) {
             System.out.println("Database not connected because the server is not running.");
             e.printStackTrace();
-        }       
+        }
         Spark.port(4567);
 
-        Spark.get("/", (request, response) -> "hello love");
+        Spark.get("/", (request, response) -> "Welcome to 2 inch");
 
-        Spark.get("/hello", (request, response) -> "hello love");
+        Spark.get("/hello", (request, response) -> "2 inch");
         
         Spark.get("/greet/:name", (request, response) -> {
             String name = request.params(":name");
@@ -99,10 +106,6 @@ public class Server {
         });
         Spark.post("blog",(request,response)->{
             response.type("String");
-            return "lol";
-        });
-        Spark.post("message",(request,response)->{
-                        response.type("String");
             return "lol";
         });
         Spark.post("/create", (request, response) -> {
@@ -167,6 +170,8 @@ public class Server {
             // return jsonString.equals("[]") ? "false" : "true";
             return jsonString;
         });
+        ServerSocket serverSocket = new ServerSocket(1234);
+        Server server = new Server(serverSocket);
         server.serverStart();
     }
 }

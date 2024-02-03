@@ -22,3 +22,15 @@ mvn exec:java -Dexec.mainClass=<name of the file>
 ``` bash 
 mvn clean install
 ```
+```bash
+docker build -t <link_ig>
+```
+```bash
+docker run 
+```
+```bash
+docker compose up
+```
+```bash
+docker image
+```

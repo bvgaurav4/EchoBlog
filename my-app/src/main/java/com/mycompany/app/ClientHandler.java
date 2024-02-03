@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.OutputStreamWriter;
+import com.google.gson.JsonObject;
+import com.google.gson.Gson;
 import java.io.InputStreamReader;
 import java.io.BufferedWriter;
 public class ClientHandler  implements Runnable{
@@ -13,8 +15,8 @@ public class ClientHandler  implements Runnable{
     public static ArrayList<ClientHandler>clientHandlers = new ArrayList<>();
     public Socket socket;
     private BufferedReader buffReader;
-    private BufferedWriter buffWriter;
-    private String name;
+    public BufferedWriter buffWriter;
+    public String name;
     
     public ClientHandler(Socket socket){
           // Constructors of all the private classes
@@ -24,7 +26,10 @@ public class ClientHandler  implements Runnable{
         this.buffReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.name = buffReader.readLine();
         clientHandlers.add(this);
-        boradcastMessage("SERVER" + name + " has entered in the room");
+        JsonObject obj = new JsonObject();
+        obj.addProperty("name", "Server");
+        obj.addProperty("message", " has entered in the room");
+        boradcastMessage(obj.toString());
 
     } catch(IOException e){
     closeAll(socket, buffReader, buffWriter);
