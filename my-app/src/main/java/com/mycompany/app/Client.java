@@ -1,4 +1,4 @@
-import java.io.IOException; // libraries 
+import java.io.IOException; 
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import javax.swing.JButton ;
 import javax.swing.JFrame ;
+import clienthandler.ClientHandler;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.JsonObject;
 import com.google.gson.Gson;
@@ -23,6 +25,7 @@ import java.awt.Toolkit;
 
 public class Client {
      // private classes for the clien
+    private ConcurrentHashMap< String,ClientHandler> clients = new ConcurrentHashMap<>();
     private Socket socket;
     private BufferedReader buffReader;
     private BufferedWriter buffWriter;
@@ -52,8 +55,12 @@ public class Client {
             Scanner sc = new Scanner(System.in);
 
             while(socket.isConnected()){
-                String messageToSend = sc.nextLine();
+                System.out.println("to?");
+                String which = sc.nextLine();
                 obj.addProperty("name", name);
+                obj.addProperty("to", which);
+                System.out.println("message?");
+                String messageToSend = sc.nextLine();
                 obj.addProperty("message", messageToSend);
                 buffWriter.write(obj.toString());
                 buffWriter.newLine();
@@ -75,7 +82,6 @@ public class Client {
 
                 while(socket.isConnected()){
                 try{
-                    System.out.println(buffReader);
                     Gson gson = new Gson();
 
                     msfFromGroupChat = buffReader.readLine();
@@ -93,13 +99,11 @@ public class Client {
                             // Handle other types (e.g., JsonArray, JsonNull)
                             System.out.println(jsonElement);
                         }
-                        // test2 = test.get("message").getAsJsonObject();
                         System.out.println(jsonElement.get("message").getAsString());
-                        System.out.println("who do u want to text to");
-                        // System.out.println(test2);
                         continue;
                     }
                     else{
+                        //client message
                         System.out.println(msfFromGroupChat);
                     }
                 } catch (IOException e){

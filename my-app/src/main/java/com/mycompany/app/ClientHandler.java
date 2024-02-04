@@ -1,6 +1,6 @@
 package clienthandler;
 
-import java.io.IOException; // libraries 
+import java.io.IOException;  
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class ClientHandler  implements Runnable{
         clientHandlers.add(this);
         JsonObject obj = new JsonObject();
         obj.addProperty("name", "Server");
-        obj.addProperty("message", " has entered in the room");
+        obj.addProperty("message", name+" has entered in the room");
         boradcastMessage(obj.toString());
 
     } catch(IOException e){
@@ -44,6 +44,7 @@ public class ClientHandler  implements Runnable{
         while(socket.isConnected()){
             try{
                 messageFromClient = buffReader.readLine();
+                
                 boradcastMessage(messageFromClient);
             } catch(IOException e){
                 closeAll(socket, buffReader,  buffWriter);
@@ -88,7 +89,5 @@ public class ClientHandler  implements Runnable{
         } catch (IOException e){
             e.getStackTrace();
         }
-
     }
-    
 }

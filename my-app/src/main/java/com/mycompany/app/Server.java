@@ -25,7 +25,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import clienthandler.ClientHandler;
 public class Server {
-    private ConcurrentHashMap< ClientHandler, String> clients = new ConcurrentHashMap<>();
+    private ConcurrentHashMap< String,ClientHandler> clients = new ConcurrentHashMap<>();
     private ServerSocket serverSocket;
     private static MongoClient mongoClient;
     private static MongoDatabase database;
@@ -52,13 +52,17 @@ public class Server {
                 ClientHandler clientHandler = new ClientHandler(socket);
                 JsonObject obj = new JsonObject();
                 obj.addProperty("name", "Server");
-                clients.put( clientHandler,clientHandler.name);
+                clients.put( clientHandler.name,clientHandler);
                 System.out.println(clientHandler + " is added to the list of clients.");
                 System.out.println("Total clients: " + clients);
                 obj.addProperty("message", clients.toString());
-                clientHandler.boradcastMessage(obj.toString());
                 Thread thread = new Thread(clientHandler);
                 thread.start();
+                System.out.println(obj.toString());
+                clientHandler.buffWriter.write(obj.toString());
+                clientHandler.buffWriter.newLine();
+                clientHandler.buffWriter.flush();
+                clientHandler.boradcastMessage(obj.toString());
             }
         } catch (IOException e){
             System.out.println("Server is closed");
@@ -80,8 +84,8 @@ public class Server {
             mongoClient = MongoClients.create("mongodb://localhost:27017/");
             database = mongoClient.getDatabase("lol");
             users = database.getCollection("lol");
-            mgs = database.getCollection("lol2");
-            blogs = database.getCollection("lol2");
+            mgs = database.getCollection("messages");
+            blogs = database.getCollection("blogs");
             grps = database.getCollection("lol2");
             lol5 = database.getCollection("lol2");
             clientSession = mongoClient.startSession();
@@ -105,6 +109,10 @@ public class Server {
             return "{\"message\": \"Hello, JSON!\"}";
         });
         Spark.post("blog",(request,response)->{
+            response.type("String");
+            return "lol";
+        });
+        Spark.post("message",(request,response)->{
             response.type("String");
             return "lol";
         });
