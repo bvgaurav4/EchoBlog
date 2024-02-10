@@ -7,9 +7,14 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.OutputStreamWriter;
 import com.google.gson.JsonObject;
-import com.google.gson.Gson;
 import java.io.InputStreamReader;
 import java.io.BufferedWriter;
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+
 public class ClientHandler  implements Runnable{
  
     public static ArrayList<ClientHandler>clientHandlers = new ArrayList<>();
@@ -44,8 +49,10 @@ public class ClientHandler  implements Runnable{
         while(socket.isConnected()){
             try{
                 messageFromClient = buffReader.readLine();
-                
-                boradcastMessage(messageFromClient);
+                Gson gson = new Gson();
+                JsonObject jsonObject = new JsonParser().parse(messageFromClient).getAsJsonObject();
+                send_specific(jsonObject.toString(), jsonObject.get("to").getAsString());
+
             } catch(IOException e){
                 closeAll(socket, buffReader,  buffWriter);
                 break;
@@ -66,10 +73,31 @@ public class ClientHandler  implements Runnable{
             }
         }
     }
+    public void send_specific(String messageToSend, String to){
+        for(ClientHandler clientHandler: clientHandlers){
+            try{
+                String name = clientHandler.name.toString();
+                System.out.println(name);
+                System.out.println(to);
+                if(name.equals(to)){
+                    clientHandler.buffWriter.write(messageToSend);
+                    clientHandler.buffWriter.newLine();
+                    clientHandler.buffWriter.flush();
+                }
+            } catch(IOException e){
+                closeAll(socket,buffReader, buffWriter);
+
+            }
+        }
+    }
     // notify if the user left the chat
     public void removeClientHandler(){
         clientHandlers.remove(this);
-        boradcastMessage("server " + name + " has gone");
+        JsonObject obj = new JsonObject();
+        obj.addProperty("name", "Server");
+        obj.addProperty("message", name + " has left the chat");
+        boradcastMessage(obj.toString());
+        
     }
 
     public void closeAll(Socket socket, BufferedReader buffReader, BufferedWriter buffWriter){

@@ -32,6 +32,16 @@
     <artifactId>spark-core</artifactId>
     <version>2.9.3</version> <!-- Check for the latest version on Maven Central -->
   </dependency>
+    <dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-controls</artifactId>
+    <version>17</version>
+  </dependency>
+  <dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-graphics</artifactId>
+    <version>17</version>
+  </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -54,7 +64,7 @@
                         <goal>java</goal>
                     </goals>
                     <configuration>
-                        <mainClass>com.mycompany.app.Server</mainClass> <!-- replace with your fully qualified main class name -->
+                        <mainClass>com.mycompany.app.Server</mainClass> 
                     </configuration>
                 </execution>
             </executions>

@@ -4,6 +4,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.net.URL;
 
 import java.io.OutputStreamWriter;
 import java.io.InputStreamReader;
@@ -14,8 +15,10 @@ import javax.swing.JFrame ;
 import clienthandler.ClientHandler;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.gson.JsonObject;
 import com.google.gson.Gson;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 
@@ -47,10 +50,11 @@ public class Client {
 // method to send messages using thread
     public void sendMessage(){
         try{
-        JsonObject obj = new JsonObject();
+            JsonObject obj = new JsonObject();
             buffWriter.write(name);
             buffWriter.newLine();
             buffWriter.flush();
+            Gson gson = new Gson();
 
             Scanner sc = new Scanner(System.in);
 
@@ -62,6 +66,7 @@ public class Client {
                 System.out.println("message?");
                 String messageToSend = sc.nextLine();
                 obj.addProperty("message", messageToSend);
+                System.out.println(clients.get(which));
                 buffWriter.write(obj.toString());
                 buffWriter.newLine();
                 buffWriter.flush();
@@ -69,7 +74,6 @@ public class Client {
             }
         } catch(IOException e){
             closeAll(socket, buffReader, buffWriter);
-
         }
     }
  // method to read messages using thread
@@ -81,37 +85,37 @@ public class Client {
                 String msfFromGroupChat;
 
                 while(socket.isConnected()){
-                try{
-                    Gson gson = new Gson();
-
-                    msfFromGroupChat = buffReader.readLine();
-                    JsonObject jsonElement = gson.fromJson(msfFromGroupChat, JsonObject.class);
-                    JsonObject test2 ;
-                    if(jsonElement.get("name").getAsString().equals("Server")){
-                        if (jsonElement.isJsonObject()) {
-                            JsonObject jsonObject = jsonElement.getAsJsonObject();
-                            // Handle JSON object
-                        } else if (jsonElement.isJsonPrimitive()) {
-                            JsonPrimitive jsonPrimitive = jsonElement.getAsJsonPrimitive();
-                            System.out.println(jsonPrimitive);
-                            // Handle JSON primitive
-                        } else {
-                            // Handle other types (e.g., JsonArray, JsonNull)
-                            System.out.println(jsonElement);
+                    try{
+                        Gson gson = new Gson();
+                        msfFromGroupChat = buffReader.readLine();
+                        JsonParser parser = new JsonParser();
+                        JsonElement jsonElement = parser.parse(msfFromGroupChat);
+                        if(jsonElement.isJsonObject())
+                        {
+                            JsonObject obj = gson.fromJson(msfFromGroupChat, JsonObject.class);
+                            String name = obj.get("name").getAsString();
+                            if(name.equals("Server")){
+                                jsonElement=parser.parse(obj.get("message").toString());
+                                try{
+                                    clients= gson.fromJson(obj.get("message").getAsString(), ConcurrentHashMap.class);
+                                }catch( Exception e){
+                                    System.out.println(e);
+                                }
+                                System.out.println("Server :"+obj.get("message").getAsString());
+                                System.out.println("clients :"+clients);
+                            }else{
+                                System.out.println(obj.toString());
+                            }
+                        }else if (jsonElement.isJsonPrimitive())
+                        {
+                            System.out.println("its a primitive");
+                        }else {
+                                System.out.println("The string is not recognized as a JSON type.");
                         }
-                        System.out.println(jsonElement.get("message").getAsString());
-                        continue;
+                    } catch (IOException e){
+                        closeAll(socket, buffReader, buffWriter);
                     }
-                    else{
-                        //client message
-                        System.out.println(msfFromGroupChat);
-                    }
-                } catch (IOException e){
-                    closeAll(socket, buffReader, buffWriter);
-                }
-
-                }
-                
+                } 
             }
             
         }).start();
@@ -138,7 +142,11 @@ public class Client {
     Scanner sc = new Scanner(System.in);
     System.out.println("Enter your name");
     String name = sc.nextLine();
+    // URL url = new URL(" https://fa56-101-0-62-94.ngrok-free.app");
+    // String host = url.getHost();
+    // int port = url.getPort() == -1 ? 80 : url.getPort(); 
     Socket socket = new Socket("localhost", 1234);
+    // Socket socket = new Socket(host, port);
     Client client = new Client(socket, name);
     client.readMessage();
     client.sendMessage();

@@ -95,9 +95,9 @@ public class Server {
         }
         Spark.port(4567);
 
-        Spark.get("/", (request, response) -> "Welcome to 2 inch");
+        Spark.get("/", (request, response) -> "Welcome ");
 
-        Spark.get("/hello", (request, response) -> "2 inch");
+        Spark.get("/hello", (request, response) -> "hello");
         
         Spark.get("/greet/:name", (request, response) -> {
             String name = request.params(":name");
