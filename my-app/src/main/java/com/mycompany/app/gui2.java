@@ -4,6 +4,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import javafx.scene.layout.GridPane;
+
+
 public class gui2 extends Application {
 
     @Override

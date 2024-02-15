@@ -6,97 +6,49 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.FindIterable;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.mongodb.client.ClientSession;
 import org.bson.types.ObjectId;
 import java.util.List;
 
-import com.google.gson.JsonObject;
-import com.google.gson.Gson;
 import org.bson.Document;
 import org.bson.json.JsonParseException;
 
 import org.bson.Document;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.io.IOException;  
-import java.net.ServerSocket;
-import java.net.Socket;
-import clienthandler.ClientHandler;
-public class Server {
-    private ConcurrentHashMap< String,ClientHandler> clients = new ConcurrentHashMap<>();
-    private ServerSocket serverSocket;
-    private static MongoClient mongoClient;
-    private static MongoDatabase database;
-    private static MongoCollection<Document> users;
-    private static MongoCollection<Document> mgs;
-    private static MongoCollection<Document> blogs;
-    private static MongoCollection<Document> grps;
-    private static MongoCollection<Document> lol5;
-    private static ClientSession clientSession;
 
-    public Server(ServerSocket serverSocket){
-        this.serverSocket = serverSocket;
-    }
+public class Simpleserver {
+    static MongoClient mongoClient;
+    static MongoDatabase database;
+    static MongoCollection<Document> users;
+    static MongoCollection<Document> mgs;
+    static MongoCollection<Document> blogs;
+    static MongoCollection<Document> grps;
+    static MongoCollection<Document> lol5;
+    static ClientSession clientSession;
 
-    public void serverStart(){
 
-        try{
-
-            while(!serverSocket.isClosed()){
-                Socket socket = serverSocket.accept();
-
-                System.out.println("New Friend Connected");
-                ClientHandler clientHandler = new ClientHandler(socket);
-                JsonObject obj = new JsonObject();
-                obj.addProperty("name", "Server");
-                clients.put( clientHandler.name,clientHandler);
-                System.out.println(clientHandler + " is added to the list of clients.");
-                System.out.println("Total clients: " + clients);
-                obj.addProperty("message", clients.toString());
-                Thread thread = new Thread(clientHandler);
-                thread.start();
-                System.out.println(obj.toString());
-                clientHandler.buffWriter.write(obj.toString());
-                clientHandler.buffWriter.newLine();
-                clientHandler.buffWriter.flush();
-                clientHandler.boradcastMessage(obj.toString());
-            }
-        } catch (IOException e){
-            System.out.println("Server is closed");
-        }
-    }
-    public void closerServer(){
-        
-        try{
-        if(serverSocket != null){
-            serverSocket.close();
-        }
-    } catch(IOException e){
-        e.printStackTrace();
-    }
-    }
-
-    public static void main(String[] args) throws Exception {
-         try {
-            mongoClient = MongoClients.create("mongodb://127.0.0.1:27108");
+    public static void main(String[] args) {
+        try {
+            mongoClient = MongoClients.create("mongodb://localhost:27017/");
             database = mongoClient.getDatabase("lol");
             users = database.getCollection("lol");
-            mgs = database.getCollection("messages");
-            blogs = database.getCollection("blogs");
+            mgs = database.getCollection("lol2");
+            blogs = database.getCollection("lol2");
             grps = database.getCollection("lol2");
             lol5 = database.getCollection("lol2");
             clientSession = mongoClient.startSession();
         } catch (Exception e) {
             System.out.println("Database not connected because the server is not running.");
             e.printStackTrace();
-        }
+        }        
+        // Set the port for your server (default is 4567)
         Spark.port(4567);
 
-        Spark.get("/", (request, response) -> "Welcome ");
+        // Define a simple endpoint
+        Spark.get("/", (request, response) -> "hello love");
 
-        Spark.get("/hello", (request, response) -> "hello");
+        Spark.get("/hello", (request, response) -> "hello love");
         
         Spark.get("/greet/:name", (request, response) -> {
             String name = request.params(":name");
@@ -112,7 +64,7 @@ public class Server {
             return "lol";
         });
         Spark.post("message",(request,response)->{
-            response.type("String");
+                        response.type("String");
             return "lol";
         });
         Spark.post("/create", (request, response) -> {
@@ -120,7 +72,7 @@ public class Server {
                 String body = request.body();
                 Document doc = Document.parse(body);
 
-                if (!doc.containsKey("Email") || !doc.containsKey("Mobile") || !doc.containsKey("LoginId") || !doc.containsKey("Username") ){
+                if (!doc.containsKey("Email") || !doc.containsKey("Mobile")) {
                     response.type("error");
                     return "Missing Email or Mobile";
                 }
@@ -138,7 +90,7 @@ public class Server {
                 } else {
                     users.insertOne(doc);
                     response.type("String");
-                    return "true";
+                    return "lol";
                 }
             } catch (JsonParseException e) {
                 response.type("error");
@@ -171,14 +123,12 @@ public class Server {
 
             String jsonString = jsonBuilder.toString();
 
-            response.type("Boolean");
-            // response.type("application/json");
+            // response.type("Boolean");
+            response.type("application/json");
             
-            return jsonString.equals("[]") ? "false" : "true";
-            // return jsonString;
+            // return jsonString.equals("[]") ? "false" : "true";
+            return jsonString;
         });
-        ServerSocket serverSocket = new ServerSocket(1234);
-        Server server = new Server(serverSocket);
-        server.serverStart();
     }
 }
+ 

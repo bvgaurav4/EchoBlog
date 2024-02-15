@@ -6,9 +6,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.OutputStreamWriter;
-import com.google.gson.JsonObject;
 import java.io.InputStreamReader;
 import java.io.BufferedWriter;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
@@ -50,6 +50,10 @@ public class ClientHandler  implements Runnable{
             try{
                 messageFromClient = buffReader.readLine();
                 Gson gson = new Gson();
+                if(messageFromClient == null){
+                    closeAll(socket, buffReader,  buffWriter);
+                    break;
+                }
                 JsonObject jsonObject = new JsonParser().parse(messageFromClient).getAsJsonObject();
                 send_specific(jsonObject.toString(), jsonObject.get("to").getAsString());
 
@@ -77,8 +81,6 @@ public class ClientHandler  implements Runnable{
         for(ClientHandler clientHandler: clientHandlers){
             try{
                 String name = clientHandler.name.toString();
-                System.out.println(name);
-                System.out.println(to);
                 if(name.equals(to)){
                     clientHandler.buffWriter.write(messageToSend);
                     clientHandler.buffWriter.newLine();
@@ -86,7 +88,6 @@ public class ClientHandler  implements Runnable{
                 }
             } catch(IOException e){
                 closeAll(socket,buffReader, buffWriter);
-
             }
         }
     }

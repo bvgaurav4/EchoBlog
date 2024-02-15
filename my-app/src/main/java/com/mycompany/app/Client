@@ -26,6 +26,15 @@ import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
+
 public class Client {
      // private classes for the clien
     private ConcurrentHashMap< String,ClientHandler> clients = new ConcurrentHashMap<>();
@@ -88,6 +97,10 @@ public class Client {
                     try{
                         Gson gson = new Gson();
                         msfFromGroupChat = buffReader.readLine();
+                        if(msfFromGroupChat == null){
+                            closeAll(socket, buffReader, buffWriter);
+                            break;
+                        }
                         JsonParser parser = new JsonParser();
                         JsonElement jsonElement = parser.parse(msfFromGroupChat);
                         if(jsonElement.isJsonObject())
@@ -102,7 +115,6 @@ public class Client {
                                     System.out.println(e);
                                 }
                                 System.out.println("Server :"+obj.get("message").getAsString());
-                                System.out.println("clients :"+clients);
                             }else{
                                 System.out.println(obj.toString());
                             }
