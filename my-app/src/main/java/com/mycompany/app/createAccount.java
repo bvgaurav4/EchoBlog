@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.shape.Circle;
+import javafx.scene.layout.StackPane;
 
 import java.io.File;
 
@@ -79,12 +80,12 @@ public class createAccount extends Application {
     }
     @Override
     public void start(Stage primaryStage) {
+
         primaryStage.setTitle("Creating account for My Application");
 
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(10, 10, 10, 10));
-        gridPane.setVgap(5);
-        gridPane.setHgap(5);
+        StackPane root = new StackPane();
+
+        
 
         Label nameLabel = new Label("Email :");
         TextField nameInput = new TextField();
@@ -128,21 +129,10 @@ public class createAccount extends Application {
                 }
             }
         });
-        gridPane.add(nameLabel, 0, 0);
-        gridPane.add(nameInput, 1, 0);
-        gridPane.add(nameLabel2, 0, 1);
-        gridPane.add(Username, 1, 1);
-        gridPane.add(profilpic, 0, 2);
-        gridPane.add(selectImageButton, 1, 2);
-        gridPane.add(imageView, 2, 2);
-        gridPane.add(phoneLabel, 0, 4);
-        gridPane.add(phoneInput, 1, 4);
-        gridPane.add(passLabel, 0, 3);
-        gridPane.add(passInput, 1, 3);
-        gridPane.add(button1, 1, 5);
-
-        Scene scene = new Scene(gridPane, 800, 600);
+        
+        Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
+        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 

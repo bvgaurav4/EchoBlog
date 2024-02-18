@@ -38,16 +38,26 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 public class Messaging extends Application {
+    private String Email;
+    private String Password;
+    public Messaging(String Email, String Password) {
+        this.Email = Email;
+        this.Password = Password;
+    }
+    public Messaging() {
+        this.Email = "email";
+        this.Password = "password";
+    }
 
     @Override
-    public void start(Stage primaryStage,String Email,String LoginId) {
+    public void start(Stage primaryStage) {
         BorderPane root = new BorderPane();
 
         // Text area for writing a blog post
         TextArea textArea = new TextArea();
         textArea.setWrapText(true);
         root.setCenter(textArea);
-                    new Thread(()->        {try {
+        new Thread(()->        {try {
             // Scanner sc = new Scanner(System.in);
             // System.out.println("Enter your name");
             String name = Email;
@@ -94,6 +104,7 @@ public class Messaging extends Application {
         Scene scene = new Scene(root, 400, 300);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Blogging Application");
+        primaryStage.setFullScreen(true);
         primaryStage.show();
 
     }

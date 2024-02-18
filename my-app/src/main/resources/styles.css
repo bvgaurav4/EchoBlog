@@ -1,0 +1,45 @@
+#gridpane {
+    /* -fx-background-color:#000;  */
+    -fx-background-image: url('doodle.jpg');    
+    -fx-padding: 10px;
+    -fx-hgap: 10px;
+    -fx-vgap: 10px;
+}
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #AAAAAA;
+}
+
+/* style.css */
+.menu-bar {
+    -fx-background-color: #333333; /* Set background color */
+}
+
+.menu {
+    -fx-text-fill: white; /* Set text color */
+    -fx-font-family: "Arial"; /* Set font family */
+    -fx-font-size: 14px; /* Set font size */
+}
+
+.menu-item {
+    -fx-text-fill: white; /* Set text color */
+    -fx-font-family: "Arial"; /* Set font family */
+    -fx-font-size: 14px; /* Set font size */
+}
+
+.menu-item:hover {
+    -fx-background-color: #555555; /* Set background color on hover */
+}
+
+.logo {
+    -fx-padding: 5px; /* Add padding */
+    -fx-background-color: #FFFFFF; /* Set background color */
+    -fx-background-radius: 5px; /* Add rounded corners */
+}

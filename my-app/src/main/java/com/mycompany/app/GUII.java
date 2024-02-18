@@ -3,18 +3,18 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class gui extends Application {
+public class GUII extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        VBox card = new VBox(10); // 10 is the spacing between elements in the VBox
-        card.setPadding(new Insets(10)); // 10 is the padding of the VBox
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(10));
+        gridPane.setVgap(10); // Vertical gap between rows
 
         // Create a rectangle to serve as a background for the card
         Rectangle rect = new Rectangle(200, 200, Color.web("#8F00FF"));
@@ -27,17 +27,16 @@ public class gui extends Application {
         // Create a button for the card
         Button button = new Button("Click me!");
 
-        // Add the rectangle and label to the card
-        card.getChildren().addAll(rect, label);
+        // Add elements to the gridPane
+        gridPane.add(rect, 0, 0, 2, 1); // column=0, row=0, colspan=2, rowspan=1
+        gridPane.add(label, 0, 1, 2, 1); // column=0, row=1, colspan=2, rowspan=1
+        gridPane.add(button, 0, 2, 2, 1); // column=0, row=2, colspan=2, rowspan=1
 
-        // Create a StackPane to hold the card and button
-        StackPane root = new StackPane();
-        root.getChildren().addAll(rect, card, button);
+        // Set alignment of elements
+        GridPane.setMargin(rect, new Insets(0, 0, 10, 0)); // Bottom margin for rectangle
+        GridPane.setMargin(button, new Insets(10, 0, 0, 0)); // Top margin for button
 
-        // Set alignment of the button to the center of the rectangle
-        StackPane.setMargin(button, new Insets(70, 0, 0, 0)); // Adjust top margin as needed
-
-        Scene scene = new Scene(root, 300, 250);
+        Scene scene = new Scene(gridPane, 300, 250);
 
         primaryStage.setTitle("Card Example");
         primaryStage.setScene(scene);

@@ -80,7 +80,7 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
          try {
-            mongoClient = MongoClients.create("mongodb://127.0.0.1:27108");
+            mongoClient = MongoClients.create("mongodb://127.0.0.1:27018");
             database = mongoClient.getDatabase("lol");
             users = database.getCollection("lol");
             mgs = database.getCollection("messages");
@@ -107,9 +107,25 @@ public class Server {
             response.type("application/json");
             return "{\"message\": \"Hello, JSON!\"}";
         });
-        Spark.post("blog",(request,response)->{
+        Spark.get("/blog",(request,response)->{
+            String Email = request.queryParams("Email");
+            Document filter = new Document("Email", Email);
+            FindIterable<Document> result = blogs.find(filter);
+            FindIterable<Document> result2 = blogs.find();
             response.type("String");
-            return "lol";
+            StringBuilder jsonBuilder = new StringBuilder();
+            jsonBuilder.append("[");
+            for (Document doc : result2) {
+                jsonBuilder.append(doc.toJson()).append(",");
+            }
+            if (jsonBuilder.length() > 1) {
+                jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
+            }
+            jsonBuilder.append("]");
+            String jsonString = jsonBuilder.toString();
+            System.out.println(jsonString);
+            return jsonString;
+            // return "lol";
         });
         Spark.post("message",(request,response)->{
             response.type("String");
@@ -172,10 +188,8 @@ public class Server {
             String jsonString = jsonBuilder.toString();
 
             response.type("Boolean");
-            // response.type("application/json");
             
             return jsonString.equals("[]") ? "false" : "true";
-            // return jsonString;
         });
         ServerSocket serverSocket = new ServerSocket(1234);
         Server server = new Server(serverSocket);
