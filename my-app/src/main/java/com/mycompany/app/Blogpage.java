@@ -95,8 +95,7 @@ public class Blogpage extends Application {
         scrollPane.setContent(blogContainerWrapper);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
-        scrollPane.setPrefWidth(600);
-        // scrollPane.setStyle("-fx-background-color: t/ransparent;");
+        scrollPane.setPrefWidth(1000);
         scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
         VBox vbox1 = new VBox();
@@ -115,7 +114,7 @@ public class Blogpage extends Application {
         hbox.getChildren().add(scrollPane);
 
         hbox.setId("gridpane");
-        Scene scene = new Scene(root, 600, 300, Color.TRANSPARENT);
+        Scene scene = new Scene(root, 1920, 1080, Color.TRANSPARENT);
                 scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
         primaryStage.setTitle("Blog Containers with Scrollbar");

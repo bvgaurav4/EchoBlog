@@ -31,11 +31,22 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonArray;
 
+
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.control.ScrollPane;
+import javafx.geometry.Insets;
+import javafx.scene.paint.Color;
 
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 
 public class Messaging extends Application {
     private String Email;
@@ -48,62 +59,113 @@ public class Messaging extends Application {
         this.Email = "email";
         this.Password = "password";
     }
-
+    public String mgs(String Email,String Email1){
+        String url = "http://localhost:4567/message?Email=" + Email + "&Email1=" + Email1;
+        String lol = "";
+        try{
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
+            int responseCode = con.getResponseCode();
+            System.out.println("GET Response Code :: " + responseCode);
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            lol =response.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lol;
+    }
     @Override
     public void start(Stage primaryStage) {
-        BorderPane root = new BorderPane();
+        VBox blogContainerWrapper = new VBox();
+        blogContainerWrapper.setSpacing(20);
+        blogContainerWrapper.setPadding(new Insets(20));
+        JsonArray blogs = new JsonArray();
+        String Email = "";
+        String Email1 = "email";
+        String lollol= mgs(Email1,Email);
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(lollol);
 
-        // Text area for writing a blog post
-        TextArea textArea = new TextArea();
-        textArea.setWrapText(true);
-        root.setCenter(textArea);
-        new Thread(()->        {try {
-            // Scanner sc = new Scanner(System.in);
-            // System.out.println("Enter your name");
-            String name = Email;
+        Lol l = new Lol();
+        VBox root = new VBox();
+        root.setSpacing(50);
+        root.getChildren().addAll(l);
+
+
+        if(element.isJsonArray()){
+            blogs = element.getAsJsonArray();
+        }
+        for(int i=0;i<blogs.size();i++)
+        {
+            JsonObject blog = blogs.get(i).getAsJsonObject();
+            BlogContainer blogContainer = new BlogContainer();
+
+            blogContainer.setTitle(blog.get("title").getAsString());
+            blogContainer.setContent(blog.get("content").getAsString());
+            blogContainer.setImage("logo.jpg"); 
+            blogContainer.setPrefWidth(600);
+            blogContainerWrapper.getChildren().add(blogContainer);
+        }
+        
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(blogContainerWrapper);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setPrefWidth(600);
+        // scrollPane.setStyle("-fx-background-color: t/ransparent;");
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+
+        VBox vbox1 = new VBox();
+        vbox1.setSpacing(20);
+        vbox1.setPadding(new Insets(20));
+        for(int i=0;i<5;i++)
+        {
+            container container = new container(200, 100, "Hello World", primaryStage);
+            vbox1.getChildren().add(container);
+        }
+        HBox hbox = new HBox(vbox1);
+        Button button = new Button("send");
+        // button.setOnAction(e->{
+        //     client.sendMessage("zipan","Za warudo");
+        // }
+        // );
+        // hbox.setAlignment(Pos.CENTER);
+        hbox.setSpacing(50);
+        root.getChildren().add(hbox);
+        // hbox.setPadding(new Insets(50));
+        hbox.getChildren().add(scrollPane);
+
+        hbox.setId("gridpane");
+        Scene scene = new Scene(root, 600, 300, Color.TRANSPARENT);
+                scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+
+        // new Thread(()->        {
+        // }).start();
+        try {
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Enter your name");
+            String name = sc.nextLine();
             System.out.println(name);
-            // URL url = new URL(" https://fa56-101-0-62-94.ngrok-free.app");
-            // String host = url.getHost();
-            // int port = url.getPort() == -1 ? 80 : url.getPort(); 
+
             Socket socket = new Socket("localhost", 1234);
-            // Socket socket = new Socket(host, port);
             Client client = new Client(socket, name);
-            client.readMessage();
-            client.sendMessage();
+            // client.readMessage();
+            // client.sendMessage("","");
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }}).start();
-        // Button to submit a blog post
-        Button submitButton = new Button("Submit");
-
-        // ListView to display existing blog posts
-        ListView<String> listView = new ListView<>();
-        listView.setPrefWidth(200);
-        listView.getItems().addAll(
-                "Blog Post 1",
-                "Blog Post 2",
-                "Blog Post 3"
-        );
-
-        // Add blog post to the list when submit button is clicked
-        submitButton.setOnAction(event -> {
-            String post = textArea.getText();
-            if (!post.isEmpty()) {
-                listView.getItems().add(post);
-                textArea.clear();
-            }
-        });
-
-        // Layout for submit button and list view
-        HBox bottomBox = new HBox(10);
-        bottomBox.getChildren().addAll(submitButton, listView);
-        root.setBottom(bottomBox);
-
-        Scene scene = new Scene(root, 400, 300);
+        }
+        primaryStage.setTitle("Blog Containers with Scrollbar");
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Blogging Application");
         primaryStage.setFullScreen(true);
         primaryStage.show();
 
@@ -113,119 +175,5 @@ public class Messaging extends Application {
 
             new Thread(()->launch(args)).start();
 
-    }
-}
- class Client {
-     // private classes for the clien
-    private ConcurrentHashMap< String,ClientHandler> clients = new ConcurrentHashMap<>();
-    private Socket socket;
-    private BufferedReader buffReader;
-    private BufferedWriter buffWriter;
-    public String name;
-
-    public Client(Socket socket, String name){
-        try{
-              // Constructors of all the private classes
-                this.socket = socket;
-                this.buffWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                this.buffReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                this.name = name;
-
-            
-        }catch (IOException e){
-            closeAll(socket, buffReader, buffWriter);
-        }
-    }
-// method to send messages using thread
-    public void sendMessage(){
-        try{
-            JsonObject obj = new JsonObject();
-            buffWriter.write(name);
-            buffWriter.newLine();
-            buffWriter.flush();
-            Gson gson = new Gson();
-
-            Scanner sc = new Scanner(System.in);
-
-            while(socket.isConnected()){
-                System.out.println("to?");
-                String which = sc.nextLine();
-                obj.addProperty("name", name);
-                obj.addProperty("to", which);
-                System.out.println("message?");
-                String messageToSend = sc.nextLine();
-                obj.addProperty("message", messageToSend);
-                System.out.println(clients.get(which));
-                buffWriter.write(obj.toString());
-                buffWriter.newLine();
-                buffWriter.flush();
-
-            }
-        } catch(IOException e){
-            closeAll(socket, buffReader, buffWriter);
-        }
-    }
- // method to read messages using thread
-    public void readMessage(){
-        new Thread( new Runnable() {
-
-            @Override
-            public void run() {
-                String msfFromGroupChat;
-
-                while(socket.isConnected()){
-                    try{
-                        Gson gson = new Gson();
-                        msfFromGroupChat = buffReader.readLine();
-                        if(msfFromGroupChat == null){
-                            closeAll(socket, buffReader, buffWriter);
-                            break;
-                        }
-                        JsonParser parser = new JsonParser();
-                        JsonElement jsonElement = parser.parse(msfFromGroupChat);
-                        if(jsonElement.isJsonObject())
-                        {
-                            JsonObject obj = gson.fromJson(msfFromGroupChat, JsonObject.class);
-                            String name = obj.get("name").getAsString();
-                            if(name.equals("Server")){
-                                jsonElement=parser.parse(obj.get("message").toString());
-                                try{
-                                    clients= gson.fromJson(obj.get("message").getAsString(), ConcurrentHashMap.class);
-                                }catch( Exception e){
-                                    System.out.println(e);
-                                }
-                                System.out.println("Server :"+obj.get("message").getAsString());
-                            }else{
-                                System.out.println(obj.toString());
-                            }
-                        }else if (jsonElement.isJsonPrimitive())
-                        {
-                            System.out.println("its a primitive");
-                        }else {
-                                System.out.println("The string is not recognized as a JSON type.");
-                        }
-                    } catch (IOException e){
-                        closeAll(socket, buffReader, buffWriter);
-                    }
-                } 
-            }
-            
-        }).start();
-    }
-// method to close everything in the socket 
-    public void closeAll(Socket socket, BufferedReader buffReader, BufferedWriter buffWriter){
-        try{
-            if(buffReader!= null){
-                buffReader.close();
-            }
-            if(buffWriter != null){
-                buffWriter.close();
-            }
-            if(socket != null){
-                socket.close();
-            }
-        } catch (IOException e){
-            e.getStackTrace();
-        }
     }
 }

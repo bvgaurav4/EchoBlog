@@ -5,6 +5,7 @@
     -fx-hgap: 10px;
     -fx-vgap: 10px;
 }
+
 .scroll-bar {
     -fx-background-color: transparent;
 }
@@ -40,6 +41,6 @@
 
 .logo {
     -fx-padding: 5px; /* Add padding */
-    -fx-background-color: #FFFFFF; /* Set background color */
+    -fx-background-color: #0000; /* Set background color */
     -fx-background-radius: 5px; /* Add rounded corners */
 }

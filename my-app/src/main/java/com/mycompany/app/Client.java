@@ -1,3 +1,14 @@
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
+import javafx.scene.layout.GridPane;
+
+
 import java.io.IOException; 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -20,22 +31,23 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonArray;
 
+
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.control.ScrollPane;
+import javafx.geometry.Insets;
+import javafx.scene.paint.Color;
 
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
-
-public class Client {
+import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+class Client {
      // private classes for the clien
     private ConcurrentHashMap< String,ClientHandler> clients = new ConcurrentHashMap<>();
     private Socket socket;
@@ -57,7 +69,7 @@ public class Client {
         }
     }
 // method to send messages using thread
-    public void sendMessage(){
+    public void sendMessage(String lol, String lol1){
         try{
             JsonObject obj = new JsonObject();
             buffWriter.write(name);
@@ -69,11 +81,17 @@ public class Client {
 
             while(socket.isConnected()){
                 System.out.println("to?");
-                String which = sc.nextLine();
+                String which = "";
+                if(lol.equals("")){
+                    which = sc.nextLine();
+                }
                 obj.addProperty("name", name);
                 obj.addProperty("to", which);
                 System.out.println("message?");
-                String messageToSend = sc.nextLine();
+                String messageToSend = "";
+                if(lol1.equals("")){
+                    messageToSend = sc.nextLine();
+                }
                 obj.addProperty("message", messageToSend);
                 System.out.println(clients.get(which));
                 buffWriter.write(obj.toString());
@@ -148,20 +166,4 @@ public class Client {
             e.getStackTrace();
         }
     }
-
-// main method
-    public static void main(String[] args) throws UnknownHostException, IOException{
-    Scanner sc = new Scanner(System.in);
-    System.out.println("Enter your name");
-    String name = sc.nextLine();
-    // URL url = new URL(" https://fa56-101-0-62-94.ngrok-free.app");
-    // String host = url.getHost();
-    // int port = url.getPort() == -1 ? 80 : url.getPort(); 
-    Socket socket = new Socket("localhost", 1234);
-    // Socket socket = new Socket(host, port);
-    Client client = new Client(socket, name);
-    client.readMessage();
-    client.sendMessage();
     }
-
-}

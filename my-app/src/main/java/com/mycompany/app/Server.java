@@ -94,9 +94,9 @@ public class Server {
         }
         Spark.port(4567);
 
-        Spark.get("/", (request, response) -> "Welcome ");
+        Spark.get("/", (request, response) -> "Za Warudo!");
 
-        Spark.get("/hello", (request, response) -> "hello");
+        Spark.get("/hello", (request, response) -> "Za Warudo!");
         
         Spark.get("/greet/:name", (request, response) -> {
             String name = request.params(":name");
@@ -125,11 +125,66 @@ public class Server {
             String jsonString = jsonBuilder.toString();
             System.out.println(jsonString);
             return jsonString;
-            // return "lol";
         });
-        Spark.post("message",(request,response)->{
+        Spark.get("message",(request,response)->{
+            String Email = request.queryParams("Email");
+            String email2 = request.queryParams("Email1");
+            Document filter = new Document("Email", Email).append("Email1", email2);
+            FindIterable<Document> result = mgs.find(filter);
+            StringBuilder jsonBuilder = new StringBuilder();
+            jsonBuilder.append("[");
+
+            for (Document doc : result) {
+                jsonBuilder.append(doc.toJson()).append(",");
+            }
+
+            if (jsonBuilder.length() > 1) {
+                jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
+            }
+
+            jsonBuilder.append("]");
+
+            String jsonString = jsonBuilder.toString();
+
             response.type("String");
-            return "lol";
+            return jsonString;
+        });
+        Spark.post("/sending",(request,response)->{
+            try {
+                String body = request.body();
+                Document doc = Document.parse(body);
+                mgs.insertOne(doc);
+                response.type("String");
+                return "true";
+            } catch (JsonParseException e) {
+                response.type("error");
+                return "Invalid JSON in request body";
+            } catch (Exception e) {
+                response.type("error");
+                return "An error occurred: " + e.getMessage();
+            }
+        });
+        Spark.get("/profile",(request,response)->{
+            String Email = request.queryParams("Email");
+            Document filter = new Document("Email", Email);
+            FindIterable<Document> result = users.find(filter);
+            StringBuilder jsonBuilder = new StringBuilder();
+            jsonBuilder.append("[");
+
+            for (Document doc : result) {
+                jsonBuilder.append(doc.toJson()).append(",");
+            }
+
+            if (jsonBuilder.length() > 1) {
+                jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
+            }
+
+            jsonBuilder.append("]");
+
+            String jsonString = jsonBuilder.toString();
+
+            response.type("String");
+            return jsonString;
         });
         Spark.post("/create", (request, response) -> {
             try {
