@@ -1,3 +1,5 @@
+package com.mycompany.app;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -29,13 +31,6 @@ public class container extends StackPane {
         StackPane.setMargin(text, new Insets(10)); // Padding around the text
         button.setOnAction(e -> {
             System.out.println("Home button clicked");
-            pages myapp = new pages();
-            try {
-                myapp.start(primaryStage);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
         });
     }
     

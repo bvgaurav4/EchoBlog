@@ -1,4 +1,4 @@
-package clienthandler;
+package com.mycompany.app;
 
 import java.io.IOException;  
 import java.net.ServerSocket;
@@ -54,8 +54,12 @@ public class ClientHandler  implements Runnable{
                     closeAll(socket, buffReader,  buffWriter);
                     break;
                 }
-                JsonObject jsonObject = new JsonParser().parse(messageFromClient).getAsJsonObject();
-                send_specific(jsonObject.toString(), jsonObject.get("to").getAsString());
+                System.out.println(messageFromClient);
+                JsonParser parser=new JsonParser();
+                if(parser.parse(messageFromClient).isJsonObject()){
+                    JsonObject jsonObject = parser.parse(messageFromClient).getAsJsonObject();
+                    send_specific(jsonObject.toString(), jsonObject.get("to").getAsString());
+                }
 
             } catch(IOException e){
                 closeAll(socket, buffReader,  buffWriter);

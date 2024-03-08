@@ -1,3 +1,6 @@
+package com.mycompany.app;
+
+
 import spark.*;
 
 import com.mongodb.client.MongoClients;
@@ -23,7 +26,7 @@ import java.util.Scanner;
 import java.io.IOException;  
 import java.net.ServerSocket;
 import java.net.Socket;
-import clienthandler.ClientHandler;
+// import clienthandler.ClientHandler;
 public class Server {
     private ConcurrentHashMap< String,ClientHandler> clients = new ConcurrentHashMap<>();
     private ServerSocket serverSocket;
@@ -51,6 +54,7 @@ public class Server {
                 ClientHandler clientHandler = new ClientHandler(socket);
                 JsonObject obj = new JsonObject();
                 obj.addProperty("name", "Server");
+                System.out.println(clientHandler.name + " joined");
                 clients.put( clientHandler.name,clientHandler);
                 System.out.println(clientHandler + " is added to the list of clients.");
                 System.out.println("Total clients: " + clients);
@@ -129,7 +133,7 @@ public class Server {
         Spark.get("message",(request,response)->{
             String Email = request.queryParams("Email");
             String email2 = request.queryParams("Email1");
-            Document filter = new Document("Email", Email).append("Email1", email2);
+            Document filter = new Document("from", Email).append("to", email2);
             FindIterable<Document> result = mgs.find(filter);
             StringBuilder jsonBuilder = new StringBuilder();
             jsonBuilder.append("[");

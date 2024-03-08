@@ -1,28 +1,29 @@
-import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.StackPane;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.geometry.Pos;
+package com.mycompany.app;
+
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import javafx.scene.layout.HBox;
 
-public class login extends Application {
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+
+public class Login extends Application {
     public boolean sending(String email, String password) {
-        // This constructor is only used to create a new instance of the class
         String url = "http://localhost:4567/";
         boolean lol = false;
         try{
@@ -50,101 +51,73 @@ public class login extends Application {
     }
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("JavaFX Login Form");
-        HBox card = new HBox(10); 
-        HBox cards = new HBox(0);
-        ImageView img = new ImageView(new Image("logo.jpg"));
-        img.setFitHeight(100);
-        img.setFitWidth(100);
-        cards.getChildren().addAll(img);
-        cards.setPadding(new Insets(10));
-        card.setPadding(new Insets(10));
-        StackPane root = new StackPane();
-        Rectangle rect1 = new Rectangle(600, 800, Color.web("#FFF",0.7));
-        Rectangle rect = new Rectangle(600, 800, Color.web("#8F00FF",0.7));
-        HBox mail = new HBox(10);
-        mail.setPadding(new Insets(100));
-        Label nameLabel = new Label("Email:");
-        TextField nameInput = new TextField();
-        mail.getChildren().addAll(nameLabel,nameInput);
-        nameInput.setPromptText("Email");
-        nameInput.setPrefWidth(200);
+        Label titleLabel = new Label("Join the club");
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
 
-        HBox pass = new HBox(10);
-        pass.setPadding(new Insets(10));
+        Label welcomeLabel = new Label("Welcome");
+        welcomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 
-        Label passLabel = new Label("Password:");
-        PasswordField passInput = new PasswordField();
-        passInput.setPromptText("Password");
-        passInput.setPrefWidth(200);
-        pass.getChildren().addAll(passLabel,passInput);
+        Label emailLabel = new Label("Email or username");
+        TextField emailField = new TextField();
 
-        HBox buttons = new HBox(10);
-        buttons.setPadding(new Insets(10));
+        Label passwordLabel = new Label("Password");
+        PasswordField passwordField = new PasswordField();
 
-        Button createButton = new Button("Create Account");
-        Button loginButton = new Button("Login");
-        buttons.getChildren().addAll(createButton,loginButton);
+        Button forgotPasswordLabel = new Button("Lost Password?");
+        forgotPasswordLabel.setTextFill(Color.PURPLE);
 
+        Button register = new Button("Create an account");
+        register.setTextFill(Color.PURPLE);
+        register.setOnAction(e->{
+            createAccount stage = new createAccount();
+            stage.start(primaryStage);
+        
+        });
 
+        Button loginButton = new Button("Log into your account");
+        loginButton.setStyle("-fx-background-color: purple; -fx-text-fill: white;");
+        
+        GridPane loginPane = new GridPane();
+        loginPane.setHgap(10);
+        loginPane.setVgap(10);
+        loginPane.add(emailLabel, 0, 0);
+        loginPane.add(emailField, 1, 0);
+        loginPane.add(passwordLabel, 0, 1);
+        loginPane.add(passwordField, 1, 1);
 
-        root.setId("gridpane");
+        VBox loginFormPane = new VBox(10);
+        loginFormPane.setMaxHeight(300);
+        loginFormPane.setAlignment(Pos.CENTER);
+        loginFormPane.getChildren().addAll(welcomeLabel, loginPane, forgotPasswordLabel, loginButton);
+
+        VBox leftPane = new VBox(20);
+        leftPane.setAlignment(Pos.CENTER_LEFT);
+        leftPane.setMaxHeight(500);
+        leftPane.setPadding(new Insets(20));
+        leftPane.setStyle("-fx-background-color: purple;");
+        leftPane.getChildren().addAll(titleLabel, new Label("Lorem ipsum dolor sit amet, consectetur"), new Label("adipiscing elit. Ut elit tellus, luctus."), register);
+        
+        HBox root = new HBox(20);
+        root.setAlignment(Pos.CENTER);
+        root.setMaxHeight(500);
+        root.getChildren().addAll(leftPane, loginFormPane);
         loginButton.setOnAction(e -> {
-            System.out.println("Username: " + nameInput.getText());
-            System.out.println("Password: " + passInput.getText());
-            boolean lol = sending(nameInput.getText(), passInput.getText());
-            System.out.println(lol);
-            // Create a new Stage for the second window
-
-            // Stage secondStage = new Stage();
-            if(lol == true) {
-            Messaging myapp = new Messaging(nameInput.getText(),passInput.getText());
-            // pages myapp = new pages();
-            // Blogpage myapp = new Blogpage(nameInput.getText(),passInput.getText());
-            System.out.println("Username: " + nameInput.getText());
-            try {
-                // myapp.start(primaryStage,nameInput.getText(),passInput.getText());
-                myapp.start(primaryStage);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            String email = emailField.getText();
+            String password = passwordField.getText();
+            if (sending(email, password)) {
+                Blogpage stage = new Blogpage();
+                stage.start(primaryStage);
+            } else {
+                root.getChildren().add(new Label("Not logged in"));
             }
         });
-        createButton.setOnAction(e -> {
-            createAccount myapp = new createAccount();
-            try {
-                myapp.start(primaryStage);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }        });
-
-       
-       
-       
-       
-        card.getChildren().addAll(rect);
-        VBox lol = new VBox(10);
-        lol.getChildren().addAll(card,mail,pass,buttons);
-        root.getChildren().addAll(card,lol);
-        StackPane.setMargin(lol, new Insets(50, 0, 0, 0));
-
-        // root.getChildren().addAll(rect, gridPane);
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
-
+        
+        Scene scene = new Scene(root, 800, 500);
+        // scene.getStylesheets().add("style.css");
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
+        primaryStage.setTitle("Beehive");
         primaryStage.show();
-        card.setAlignment(Pos.CENTER);
-
-        // For the HBoxes
-        cards.setAlignment(Pos.CENTER);
-        card.setAlignment(Pos.CENTER);   
-        mail.setAlignment(Pos.CENTER);
-        pass.setAlignment(Pos.CENTER);
-        buttons.setAlignment(Pos.CENTER);
-        lol.setAlignment(Pos.CENTER);
-        root.setAlignment(Pos.CENTER); // Add this line
     }
 
     public static void main(String[] args) {

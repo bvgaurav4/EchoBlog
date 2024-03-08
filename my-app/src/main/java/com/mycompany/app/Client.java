@@ -1,13 +1,4 @@
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
-import javafx.scene.layout.GridPane;
-
+package com.mycompany.app;
 
 import java.io.IOException; 
 import java.net.ServerSocket;
@@ -23,7 +14,6 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import javax.swing.JButton ;
 import javax.swing.JFrame ;
-import clienthandler.ClientHandler;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.Gson;
@@ -33,77 +23,71 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonArray;
 
-
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.control.ScrollPane;
-import javafx.geometry.Insets;
-import javafx.scene.paint.Color;
 
-import java.awt.FlowLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.net.URL;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+
+
+
 class Client {
-     // private classes for the clien
+    public interface MessageReceivedCallback {
+        void onMessageReceived(String message);
+    }
     private ConcurrentHashMap< String,ClientHandler> clients = new ConcurrentHashMap<>();
+    private MessageReceivedCallback callback;
+
     private Socket socket;
     private BufferedReader buffReader;
     private BufferedWriter buffWriter;
     public String name;
 
-    public Client(Socket socket, String name){
+    public Client(Socket socket, String name, MessageReceivedCallback callback){
         try{
-              // Constructors of all the private classes
                 this.socket = socket;
                 this.buffWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 this.buffReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 this.name = name;
-
+                this.callback = callback;
             
         }catch (IOException e){
             closeAll(socket, buffReader, buffWriter);
         }
     }
-// method to send messages using thread
-    public void sendMessage(String lol, String lol1){
-        try{
-            JsonObject obj = new JsonObject();
+public void sendMessage(String lol, String lol1){
+    try{
+        JsonObject obj = new JsonObject();
+        if(lol.equals("")){
             buffWriter.write(name);
             buffWriter.newLine();
             buffWriter.flush();
-            Gson gson = new Gson();
-
-            Scanner sc = new Scanner(System.in);
-
-            while(socket.isConnected()){
-                System.out.println("to?");
-                String which = "";
-                if(lol.equals("")){
-                    which = sc.nextLine();
-                }
-                obj.addProperty("name", name);
-                obj.addProperty("to", which);
-                System.out.println("message?");
-                String messageToSend = "";
-                if(lol1.equals("")){
-                    messageToSend = sc.nextLine();
-                }
-                obj.addProperty("message", messageToSend);
-                System.out.println(clients.get(which));
-                buffWriter.write(obj.toString());
-                buffWriter.newLine();
-                buffWriter.flush();
-
-            }
-        } catch(IOException e){
-            closeAll(socket, buffReader, buffWriter);
         }
+        Gson gson = new Gson();
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("to?");
+        String which = "";
+        which = lol;    
+        if(lol.equals("term")){
+            which = sc.nextLine();
+        }
+        obj.addProperty("name", name);
+        obj.addProperty("to", which);
+        System.out.println("message?");
+        String messageToSend = "";
+        messageToSend = lol1;
+        if(lol1.equals("")){
+            messageToSend = sc.nextLine();
+        }
+        
+        obj.addProperty("message", messageToSend);
+        System.out.println(clients.get(which));
+        buffWriter.write(obj.toString());
+        buffWriter.newLine();
+        buffWriter.flush();
+
+    } catch(IOException e){
+        closeAll(socket, buffReader, buffWriter);
     }
- // method to read messages using thread
+}
     public void readMessage(){
         new Thread( new Runnable() {
 
@@ -125,16 +109,18 @@ class Client {
                         {
                             JsonObject obj = gson.fromJson(msfFromGroupChat, JsonObject.class);
                             String name = obj.get("name").getAsString();
-                            if(name.equals("Server")){
-                                jsonElement=parser.parse(obj.get("message").toString());
-                                try{
-                                    clients= gson.fromJson(obj.get("message").getAsString(), ConcurrentHashMap.class);
-                                }catch( Exception e){
+                            if (name.equals("Server")) {
+                                jsonElement = parser.parse(obj.get("message").toString());
+                                try {
+                                    clients = gson.fromJson(obj.get("message").getAsString(), ConcurrentHashMap.class);
+                                } catch (Exception e) {
                                     System.out.println(e);
                                 }
-                                System.out.println("Server :"+obj.get("message").getAsString());
-                            }else{
-                                System.out.println(obj.toString());
+                                System.out.println("Server :" + obj.get("message").getAsString());
+                                callback.onMessageReceived(obj.toString()); // Fix: Pass a VBox object instead of a JsonObject
+                            } else {
+                                System.out.println(obj.get("name") + obj.toString());
+                                callback.onMessageReceived(obj.toString()); 
                             }
                         }else if (jsonElement.isJsonPrimitive())
                         {
@@ -150,7 +136,6 @@ class Client {
             
         }).start();
     }
-// method to close everything in the socket 
     public void closeAll(Socket socket, BufferedReader buffReader, BufferedWriter buffWriter){
         try{
             if(buffReader!= null){

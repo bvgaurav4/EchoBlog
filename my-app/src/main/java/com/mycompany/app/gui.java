@@ -1,46 +1,104 @@
+package com.mycompany.app;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class gui extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        VBox card = new VBox(10); // 10 is the spacing between elements in the VBox
-        card.setPadding(new Insets(10)); // 10 is the padding of the VBox
+        // Create UI components
+        Label titleLabel = new Label("Beehive");
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
 
-        // Create a rectangle to serve as a background for the card
-        Rectangle rect = new Rectangle(200, 200, Color.web("#8F00FF"));
-        rect.setArcHeight(105.0);
-        rect.setArcWidth(105.0);
+        Label welcomeLabel = new Label("Welcome");
+        welcomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 
-        // Create a label for the card
-        Label label = new Label("This is a card!");
+        Label emailLabel = new Label("Email or username");
+        TextField emailField = new TextField();
 
-        // Create a button for the card
-        Button button = new Button("Click me!");
+        Label passwordLabel = new Label("Password");
+        PasswordField passwordField = new PasswordField();
 
-        // Add the rectangle and label to the card
-        card.getChildren().addAll(rect, label);
+        CheckBox rememberCheckBox = new CheckBox("Remember");
+        Button forgotPasswordButton = new Button("Lost Password?");
+        forgotPasswordButton.setStyle("-fx-text-fill: purple; -fx-background-color: transparent;");
 
-        // Create a StackPane to hold the card and button
-        StackPane root = new StackPane();
-        root.getChildren().addAll(rect, card, button);
+        Button loginButton = new Button("Log into your account");
+        loginButton.setStyle("-fx-background-color: purple; -fx-text-fill: white;");
 
-        // Set alignment of the button to the center of the rectangle
-        StackPane.setMargin(button, new Insets(70, 0, 0, 0)); // Adjust top margin as needed
+        Button signupButton = new Button("Signup is disabled");
+        signupButton.setStyle("-fx-text-fill: gray; -fx-background-color: transparent;");
 
-        Scene scene = new Scene(root, 300, 250);
+        // Create layout containers for login form
+        GridPane loginPane = new GridPane();
+        loginPane.setHgap(10);
+        loginPane.setVgap(10);
+        loginPane.add(emailLabel, 0, 0);
+        loginPane.add(emailField, 1, 0);
+        loginPane.add(passwordLabel, 0, 1);
+        loginPane.add(passwordField, 1, 1);
 
-        primaryStage.setTitle("Card Example");
+        HBox rememberPane = new HBox(10);
+        rememberPane.setAlignment(Pos.CENTER_RIGHT);
+        rememberPane.getChildren().addAll(rememberCheckBox, forgotPasswordButton);
+
+        VBox loginFormPane = new VBox(10);
+        loginFormPane.setAlignment(Pos.CENTER);
+        loginFormPane.getChildren().addAll(welcomeLabel, loginPane, rememberPane, loginButton, signupButton);
+
+        // Create layout containers for marketing section
+        Label clubLabel = new Label("Join the club");
+        clubLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+
+        Label joinLabel = new Label("Join millions of people");
+        joinLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+
+        Label descriptionLabel = new Label("Connect with others, share experiences, and explore new opportunities.");
+        descriptionLabel.setWrapText(true);
+
+        Button registerButton = new Button("Register");
+        registerButton.setStyle("-fx-background-color: purple; -fx-text-fill: white;");
+
+        // Image image = new Image("placeholder_image.jpg"); // Replace with your image file path
+        // ImageView imageView = new ImageView(image);
+        // imageView.setFitWidth(300);
+        // imageView.setPreserveRatio(true);
+
+        VBox marketingPane = new VBox(20);
+        marketingPane.setAlignment(Pos.CENTER_LEFT);
+        marketingPane.setPadding(new Insets(20));
+        marketingPane.getChildren().addAll(clubLabel, joinLabel, descriptionLabel, registerButton);
+
+        // Create the root layout container
+        BorderPane root = new BorderPane();
+        root.setLeft(loginFormPane);
+        root.setRight(marketingPane);
+
+        // Create and configure the scene
+        Scene scene = new Scene(root, 800, 500);
+        // scene.getStylesheets().add("your_stylesheet.css"); // Optional: Add a CSS stylesheet
+
+        // Set the scene and show the stage
         primaryStage.setScene(scene);
+        primaryStage.setTitle("Beehive");
         primaryStage.show();
     }
 

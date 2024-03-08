@@ -1,3 +1,5 @@
+package com.mycompany.app;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,7 +24,35 @@ import java.net.HttpURLConnection;
 public class Blogpage extends Application {
     private String email;
     private String password;
-
+    public JsonArray getmessage(String email, String password) {
+        String url = "http://localhost:4567/";
+        JsonArray lol = new JsonArray();
+        try{
+        url = url + "login?Email=" + email + "&LoginId=" + password;
+        System.out.println(url);
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("GET");
+        int responseCode = con.getResponseCode();
+        System.out.println("GET Response Code :: " + responseCode);
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(response.toString());
+        if(element.isJsonArray()){
+            lol = element.getAsJsonArray();
+        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lol;
+    }
     public Blogpage(String emailn, String passwordn) {
         this.email = emailn;
         this.password = passwordn;
@@ -70,7 +100,7 @@ public class Blogpage extends Application {
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(lollol);
 
-        Lol l = new Lol();
+        Nav l = new Nav(primaryStage, email, "", Email);
         VBox root = new VBox();
         root.setSpacing(50);
         root.getChildren().addAll(l);
@@ -107,15 +137,14 @@ public class Blogpage extends Application {
             vbox1.getChildren().add(container);
         }
         HBox hbox = new HBox(vbox1);
-        // hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(50);
         root.getChildren().add(hbox);
-        // hbox.setPadding(new Insets(50));
         hbox.getChildren().add(scrollPane);
 
         hbox.setId("gridpane");
         Scene scene = new Scene(root, 1920, 1080, Color.TRANSPARENT);
-                scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+
 
         primaryStage.setTitle("Blog Containers with Scrollbar");
         primaryStage.setScene(scene);

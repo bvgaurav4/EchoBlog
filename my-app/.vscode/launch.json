@@ -1,0 +1,33 @@
+{
+    "vmArgs": "--module-path /mnt/c/g/openjfx-17.0.10_linux-x64_bin-sdk/javafx-sdk-17.0.10/lib --add-modules javafx.controls,javafx.fxml",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Login",
+            "request": "launch",
+            "mainClass": "com.mycompany.app.Login",
+            "projectName": "my-app"
+        },
+        {
+            "type": "java",
+            "name": "createAccount",
+            "request": "launch",
+            "mainClass": "com.mycompany.app.createAccount",
+            "projectName": "my-app"
+        },
+        {
+            "type": "java",
+            "name": "Messaging",
+            "request": "launch",
+            "mainClass": "com.mycompany.app.Messaging",
+            "projectName": "my-app"
+        },
+        {
+            "type": "java",
+            "name": "Server",
+            "request": "launch",
+            "mainClass": "com.mycompany.app.Server",
+            "projectName": "my-app"
+        }
+    ]
+}

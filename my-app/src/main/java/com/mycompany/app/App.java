@@ -1,3 +1,5 @@
+package com.mycompany.app;
+
 import java.net.*;
 import java.io.*;
 

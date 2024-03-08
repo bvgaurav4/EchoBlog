@@ -1,0 +1,9 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/mnt/c/g/openjfx-17.0.10_linux-x64_bin-sdk/javafx-sdk-17.0.10/lib/*.jar"
+    ],
+    "java.runtimePath": "/mnt/c/g/openjfx-17.0.10_linux-x64_bin-sdk/javafx-sdk-17.0.10/lib",
+
+}

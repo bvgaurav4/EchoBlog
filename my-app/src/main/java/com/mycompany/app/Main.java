@@ -1,3 +1,5 @@
+package com.mycompany.app;
+
 import javafx.application.Application;
 
 import javafx.scene.Scene;
@@ -17,7 +19,6 @@ public class Main extends Application {
         
         root.getChildren().add(new Label("Za Warudo!"));
         root.getChildren().add(new Text("Za Warudo!"));
-        scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
         primaryStage.setScene(scene);
         primaryStage.show();

@@ -1,3 +1,5 @@
+package com.mycompany.app;
+
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,20 +18,29 @@ public class BlogContainer extends BorderPane {
     private Text contentText;
     private String email;
     private ImageView imageView;
-
+    // BlogContainer(String email, String title, String content, String imageUrl) {
+    //     this.email = email;
+    //     titleLabel.setText(title);
+    //     contentText.setText(content);
+    //     Image image = new Image(imageUrl);
+    //     imageView.setImage(image);
+    // }
     public BlogContainer() {
         super();
 
         textContainer = new VBox();
         textContainer.setSpacing(5);
+        textContainer.setMaxWidth(500);
 
         Button button = new Button("like");
         Button commnet = new Button("comment");
 
         titleLabel = new Text();
+        titleLabel.setWrappingWidth(500);
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;-fx-fill: #8F00FF;");
 
         contentText = new Text();
+        contentText.setWrappingWidth(500);
 
         textContainer.getChildren().addAll(titleLabel, contentText);
         textContainer.getChildren().addAll(button, commnet);
@@ -52,6 +63,7 @@ public class BlogContainer extends BorderPane {
 
     public void setTitle(String title) {
         titleLabel.setText(title);
+
     }
 
     public void setContent(String content) {

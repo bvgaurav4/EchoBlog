@@ -1,3 +1,5 @@
+package com.mycompany.app;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -100,10 +102,8 @@ public void start(Stage primaryStage) {
     });
 
         Scene scene = new Scene(grid);
-        scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         primaryStage.setScene(scene);
-        // scene.getStylesheets().add("/styles.css");
-// scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         primaryStage.setFullScreen(true);
         primaryStage.show();
 

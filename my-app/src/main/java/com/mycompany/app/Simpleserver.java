@@ -1,3 +1,5 @@
+package com.mycompany.app;
+
 import spark.*;
 
 import com.mongodb.client.MongoClients;
