@@ -31,52 +31,52 @@ import java.net.URL;
 
 import com.google.gson.JsonObject;
 
-
 public class createAccount extends Application {
     public boolean sending(String email, String password, String username, String mobile, String profilepic) {
         String url = "http://localhost:4567/";
         boolean lol = false;
-        try{
-        URL uurl = new URL(url+"create");
-        HttpURLConnection con = (HttpURLConnection) uurl.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type","application/json");
-        JsonObject obj = new JsonObject();
-        obj.addProperty("Email", email);
-        obj.addProperty("LoginId", password);
-        obj.addProperty("Username", username);
-        obj.addProperty("ProfilePic", "profilepic");
-        obj.addProperty("Mobile", mobile);
-        
-        String putJsonData = obj.toString();
-        con.setDoOutput(true);  
-        OutputStream os = con.getOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-        writer.write(putJsonData);
-        writer.flush();
-        writer.close();
-        os.close();
+        try {
+            URL uurl = new URL(url + "create");
+            HttpURLConnection con = (HttpURLConnection) uurl.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            JsonObject obj = new JsonObject();
+            obj.addProperty("Email", email);
+            obj.addProperty("LoginId", password);
+            obj.addProperty("Name", username);
+            obj.addProperty("ProfilePic", "profilepic");
+            obj.addProperty("Mobile", mobile);
 
-        int responseCode = con.getResponseCode();
-        System.out.println("nSending 'POST' request to URL : " + url);
-        System.out.println("Post Data : " + putJsonData);
-        System.out.println("Response Code : " + responseCode);  
-        BufferedReader in = new BufferedReader(
-            new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
+            String putJsonData = obj.toString();
+            con.setDoOutput(true);
+            OutputStream os = con.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            writer.write(putJsonData);
+            writer.flush();
+            writer.close();
+            os.close();
 
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-        System.out.println(response.toString());
-        lol =response.toString().equals("true");
+            int responseCode = con.getResponseCode();
+            System.out.println("nSending 'POST' request to URL : " + url);
+            System.out.println("Post Data : " + putJsonData);
+            System.out.println("Response Code : " + responseCode);
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            System.out.println(response.toString());
+            lol = response.toString().equals("true");
         } catch (Exception e) {
             e.printStackTrace();
         }
         return lol;
     }
+
     @Override
     public void start(Stage primaryStage) {
 
@@ -84,29 +84,29 @@ public class createAccount extends Application {
 
         Label nameLabel = new Label("Email :");
         TextField nameInput = new TextField();
-        
+
         Label nameLabel2 = new Label("Username :");
         TextField Username = new TextField();
-        
-        Label passLabel = new Label("Password:");        
+
+        Label passLabel = new Label("Password:");
         PasswordField passInput = new PasswordField();
-        
+
         Button button1 = new Button("Create Account");
-        
+
         Label phoneLabel = new Label("Phone Number:");
         TextField phoneInput = new TextField();
-        
+
         Label profilpic = new Label("Profile Picture :");
         ImageView imageView = new ImageView();
-        imageView.setFitWidth(100); 
-        imageView.setFitHeight(100); 
+        imageView.setFitWidth(100);
+        imageView.setFitHeight(100);
         imageView.setPreserveRatio(true);
-        Circle circleClip = new Circle(50, 50, 50); 
+        Circle circleClip = new Circle(50, 50, 50);
         imageView.setClip(circleClip);
         Button selectImageButton = new Button("Select Image");
 
-        GridPane  createforms = new GridPane();
-        
+        GridPane createforms = new GridPane();
+
         createforms.setHgap(10);
         createforms.setVgap(10);
         createforms.add(nameLabel, 0, 0);
@@ -124,33 +124,32 @@ public class createAccount extends Application {
         createforms.setPadding(new Insets(10));
         createforms.setMaxHeight(500);
 
-        
         VBox left = new VBox(20);
         left.setMaxHeight(500);
         left.setPadding(new Insets(10));
         left.setStyle("-fx-background-color: #8F00FF;");
 
         left.setAlignment(Pos.CENTER_LEFT);
-        left.getChildren().addAll(new Label("Create ur Echoblog account"),createforms, button1);
-        
+        left.getChildren().addAll(new Label("Create ur Echoblog account"), createforms, button1);
+
         VBox right = new VBox(20);
         right.setMaxHeight(500);
         right.setPadding(new Insets(10));
         right.setStyle("-fx-background-color: #D3D3D3;");
 
         right.setAlignment(Pos.CENTER_RIGHT);
-        right.getChildren().addAll(new Label("Lorem ipsum dolor sit amet, consectetur"), new Label("adipiscing elit. Ut elit tellus, luctus."));
-        
-        
+        right.getChildren().addAll(new Label("Lorem ipsum dolor sit amet, consectetur"),
+                new Label("adipiscing elit. Ut elit tellus, luctus."));
+
         HBox center = new HBox();
         center.setPadding(new Insets(10));
         center.setAlignment(Pos.CENTER);
         center.getChildren().addAll(left, right);
 
-
         selectImageButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+            fileChooser.getExtensionFilters()
+                    .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
             File selectedFile = fileChooser.showOpenDialog(primaryStage);
             if (selectedFile != null) {
                 Image image = new Image(selectedFile.toURI().toString());
@@ -159,24 +158,22 @@ public class createAccount extends Application {
         });
         button1.setOnAction(e -> {
 
-            boolean lol = sending(nameInput.getText(), passInput.getText(), Username.getText(), phoneInput.getText(), "profilepic");
+            boolean lol = sending(nameInput.getText(), passInput.getText(), Username.getText(), phoneInput.getText(),
+                    "profilepic");
             System.out.println(lol);
-            if(lol == true) {
+            if (lol == true) {
                 Login myapp = new Login();
                 try {
                     myapp.start(primaryStage);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-            }
-            else{
-                
+            } else {
+
             }
         });
 
-
         center.setAlignment(Pos.CENTER);
-
 
         Scene scene = new Scene(center, 800, 800);
         primaryStage.setScene(scene);

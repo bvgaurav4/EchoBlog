@@ -7,74 +7,98 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 
-import java.io.IOException; 
-import java.net.ServerSocket;
+import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.net.URL;
 
-import java.io.OutputStreamWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.UnknownHostException;
-import java.util.Scanner;
-import javax.swing.JButton ;
-import javax.swing.JFrame ;
-import java.util.concurrent.ConcurrentHashMap;
+
+import java.time.LocalDateTime;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonArray;
-
 
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
 import javafx.scene.control.ScrollPane;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
-import javafx.animation.FadeTransition;  
-import java.awt.FlowLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.net.URL;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+
 import java.net.HttpURLConnection;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonArray;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+
 public class Messaging extends Application {
+    @SuppressWarnings("unused")
     private String myEmail;
+    @SuppressWarnings("unused")
     private String sEmail;
     private String Password;
     private Client client;
 
-    public Messaging(String Email,String sEmail, String Password) {
+    public Messaging(String Email, String sEmail, String Password) {
         this.myEmail = Email;
         this.sEmail = sEmail;
         this.Password = Password;
     }
+
     public Messaging() {
         this.myEmail = "email";
         this.Password = "password";
 
     }
-    public String mgs(String Email,String Email1){
+
+    @SuppressWarnings("deprecation")
+    private String sending_messages(String Email, String Email1, String message) {
+        String url = "http://localhost:4567/sending";
+        JsonObject lol = new JsonObject();
+        lol.addProperty("source", Email);
+        lol.addProperty("target", Email1);
+        lol.addProperty("message", message);
+        lol.addProperty("timestamp", LocalDateTime.now().toString());
+        System.out.println(lol);
+        try {
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setDoOutput(true);
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(con.getOutputStream(), "UTF-8"));
+            out.write(lol.toString());
+            out.flush();
+            out.close();
+            int responseCode = con.getResponseCode();
+            System.out.println("POST Response Code :: " + responseCode);
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            return response.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "false";
+    }
+
+    private String mgs(String Email, String Email1) {
         String url = "http://localhost:4567/message?Email=" + Email + "&Email1=" + Email1;
         String lol = "";
-        try{
+        try {
+            @SuppressWarnings("deprecation")
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
@@ -87,108 +111,142 @@ public class Messaging extends Application {
                 response.append(inputLine);
             }
             in.close();
-            lol =response.toString();
+            lol = response.toString();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return lol;
     }
+
+    @SuppressWarnings("deprecation")
     @Override
     public void start(Stage primaryStage) {
+        StackPane root2Pane = new StackPane();
         VBox blogContainerWrapper = new VBox();
         blogContainerWrapper.setSpacing(20);
         blogContainerWrapper.setPadding(new Insets(20));
         JsonArray blogs = new JsonArray();
         JsonArray messages = new JsonArray();
 
+        HBox sendingBox = new HBox();
+        sendingBox.setSpacing(20);
+        sendingBox.setPadding(new Insets(20));
+        sendingBox.setStyle("-fx-background: transparent; -fx-background-color: rgba(255, 255, 255, 0.5);");
+        sendingBox.setAlignment(Pos.CENTER_LEFT);
+
+        javafx.scene.control.TextField messageField = new javafx.scene.control.TextField();
+        messageField.setText("");
+
+        Button sendButton = new Button("Send");
+        sendButton.setPrefWidth(50);
+        sendButton.setPrefHeight(25);
+        sendButton.setStyle("-fx-font-size: 18px;");
+
+        sendingBox.getChildren().add(messageField);
+        sendingBox.getChildren().add(sendButton);
+
+        VBox messaging = new VBox();
+        messaging.setSpacing(20);
+        messaging.setPadding(new Insets(20));
+        messaging.setStyle("-fx-background: transparent; -fx-background-color: rgba(255, 255, 255, 0.5);");
+        messaging.setAlignment(Pos.CENTER_LEFT);
+
         String Email = "DIO";
         String Email1 = "JOTARO";
-        String lollol= mgs(Email1,Email);
+        String lollol = mgs(Email1, Email);
+        @SuppressWarnings("unused")
         Gson gson = new Gson();
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(lollol);
         Nav l = new Nav(primaryStage, Email, Password, Email1);
         VBox root = new VBox();
         root.setSpacing(50);
-        
-        
-        if(element.isJsonArray()){
+
+        if (element.isJsonArray()) {
             blogs = element.getAsJsonArray();
         }
         System.out.println(blogs);
-        lollol= mgs(Email,Email1);
+        lollol = mgs(Email, Email1);
         element = parser.parse(lollol);
-        if(element.isJsonArray()){
+        if (element.isJsonArray()) {
             messages = element.getAsJsonArray();
         }
         System.out.println(messages);
         blogs.addAll(messages);
 
-        for(int i=0;i<blogs.size();i++)
-        {
+        for (int i = 0; i < blogs.size(); i++) {
             JsonObject blog = blogs.get(i).getAsJsonObject();
             MessageContainer bl = new MessageContainer();
-            bl.setTitle(blog.get("from").getAsString());
-            bl.setContent(blog.get("message").getAsString());
-            blogContainerWrapper.getChildren().add(bl);   
+            bl.setTitle("lol");
+            bl.setContent("lol");
+            blogContainerWrapper.getChildren().add(bl);
         }
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(blogContainerWrapper);
         scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
         scrollPane.setPrefWidth(1000);
         blogContainerWrapper.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override 
-            public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight,
+                    Number newSceneHeight) {
                 scrollPane.setVvalue(1.0d);
             }
         });
-        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
-        
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: rgba(255, 255, 255, 0.5);");
+
+        messaging.getChildren().add(scrollPane);
+        messaging.getChildren().add(sendingBox);
+
         VBox vbox1 = new VBox();
         vbox1.setSpacing(20);
         vbox1.setPadding(new Insets(20));
-        for(int i=0;i<5;i++)
-        {
-            container container = new container(300, 100, "Hello World", primaryStage);
+        for (int i = 0; i < 5; i++) {
+            container container = new container(2);
+            container.setTitle("DIO");
+            container.setStage(primaryStage);
+            container.setContent("DIO");
             vbox1.getChildren().add(container);
         }
         HBox hbox = new HBox(vbox1);
-        Button button = new Button("send");
-        button.setOnAction(e -> {
+        sendButton.setOnAction(e -> {
             if (client != null) {
-                button.setDisable(true);
-                client.sendMessage("zipan","Za warudo");
-                button.setDisable(false);
+                sendButton.setDisable(true);
+                if (messageField.getText().length() > 0) {
+                    MessageContainer bl = new MessageContainer();
+                    bl.setTitle("You");
+                    bl.setContent(messageField.getText());
+                    blogContainerWrapper.getChildren().add(bl);
+                    String mf = sending_messages(Email, Email1, messageField.getText());
+                    System.out.println(mf);
+                    if (mf.equals("false")) {
+                        System.out.println("ur offline");
+                    }
+                    client.sendMessage(Email1, messageField.getText());
+                    messageField.clear();
+                }
+                sendButton.setDisable(false);
             }
         });
-            hbox.setSpacing(50);
-            hbox.getChildren().add(button);
-            root.getChildren().addAll(l);
-            root.getChildren().addAll(hbox);
-            // hbox.setPadding(new Insets(50));
-        hbox.getChildren().add(scrollPane);
+        hbox.setSpacing(50);
+        hbox.getChildren().add(messaging);
+        root.getChildren().addAll(l);
+        root.getChildren().addAll(hbox);
 
         hbox.setId("gridpane");
-        Scene scene = new Scene(root, 1920, 1080, Color.TRANSPARENT);
-        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-
+        root2Pane.getChildren().add(root);
+        Scene scene = new Scene(root2Pane, 1920, 1080, Color.TRANSPARENT);
+        // scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
 
         try {
-            Scanner sc = new Scanner(System.in);
-            System.out.println("Enter your name");
-            String name = sc.nextLine();
-            System.out.println(name);
-
             Socket socket = new Socket("localhost", 1234);
-            client = new Client(socket, name, (message) -> {
+            client = new Client(socket, Email, (message) -> {
                 Platform.runLater(() -> {
                     System.out.println("Message received: " + message);
-                    FadeTransition fade = new FadeTransition();  
+                    FadeTransition fade = new FadeTransition();
                     BlogContainer bl = new BlogContainer();
                     bl.setTitle("Title");
-                    bl.setContent(message); 
+                    bl.setContent(message);
                     fade.setDuration(javafx.util.Duration.millis(5000));
                     fade.setNode(bl);
                     blogContainerWrapper.getChildren().add(bl);
@@ -205,21 +263,23 @@ public class Messaging extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        new Thread(()-> {
+        new Thread(() -> {
             client.readMessage();
-            client.sendMessage("","");
-            while(true)
-            {
-                client.sendMessage("term","");
+            client.sendMessage("", "");
+            while (true) {
+                client.sendMessage("term", "");
             }
         }).start();
         scrollPane.setVvalue(1.0);
         primaryStage.setTitle("Blog Containers with Scrollbar");
         primaryStage.setScene(scene);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+
         primaryStage.setFullScreen(true);
         primaryStage.show();
     }
+
     public static void main(String[] args) {
-            launch(args);
+        launch(args);
     }
 }
